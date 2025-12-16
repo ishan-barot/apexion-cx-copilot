@@ -187,7 +187,7 @@ Users rate every query result as "Helpful" or "Not Helpful":
 - Guides model improvement efforts
 - Tracks user satisfaction over time
 
-## 🛠️ Development
+## Development
 
 ### Project Structure
 
