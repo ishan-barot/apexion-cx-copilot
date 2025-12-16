@@ -4,20 +4,20 @@ A production-ready Flask application that enables natural language querying of c
 
 ![Apexion CX Copilot](https://img.shields.io/badge/Flask-3.0.0-blue) ![Python](https://img.shields.io/badge/Python-3.8+-green) ![OpenAI](https://img.shields.io/badge/OpenAI-GPT--4-orange)
 
-## 🎯 Overview
+## Overview
 
 Apexion CX Copilot transforms how teams interact with customer data by allowing business users to ask questions in plain English instead of writing SQL queries. The system intelligently converts natural language to SQL, executes queries safely, and summarizes results with citations to specific data points.
 
 **Key Capabilities:**
-- 🔍 Natural language to SQL conversion using GPT-4
-- 🛡️ Safe query execution with comprehensive SQL injection prevention
-- 📊 Intelligent result summarization with row-level citations
-- 📝 Handles both structured tables and unstructured customer notes
-- 📈 Complete logging system for analysis and improvement
-- 💬 User feedback mechanism to track query quality
-- 📜 Query history tracking per user session
+- Natural language to SQL conversion using GPT-4
+- Safe query execution with comprehensive SQL injection prevention
+- Intelligent result summarization with row-level citations
+- Handles both structured tables and unstructured customer notes
+- Complete logging system for analysis and improvement
+- User feedback mechanism to track query quality
+- Query history tracking per user session
 
-## 🏗️ Architecture
+## Architecture
 
 ```
 ┌─────────────────┐
@@ -51,7 +51,7 @@ Apexion CX Copilot transforms how teams interact with customer data by allowing 
 └─────────────────┘
 ```
 
-## 📦 Database Schema
+## Database Schema
 
 The system manages a comprehensive CX data model:
 
@@ -73,7 +73,7 @@ Comprehensive logging of all queries including prompts, generated SQL, execution
 ### **feedback**
 User feedback ratings (helpful/not helpful) linked to specific queries for quality measurement.
 
-## 🚀 Quick Start
+## Quick Start
 
 ### Prerequisites
 
@@ -124,7 +124,7 @@ python app.py
 
 The application will be available at `http://localhost:5000`
 
-## 💡 Usage Examples
+## Usage Examples
 
 ### Example Queries
 
@@ -161,7 +161,7 @@ The system provides three types of information:
 3. **Data Table**: Raw results with row numbers for citation reference
    - Scrollable, sortable interface for detailed analysis
 
-## 🔒 Security Features
+## Security Features
 
 - **SQL Injection Prevention**: Multi-layer validation ensures only SELECT queries are executed
 - **Query Sanitization**: Blocks dangerous keywords (DROP, DELETE, INSERT, etc.)
@@ -169,7 +169,7 @@ The system provides three types of information:
 - **Read-Only Access**: No data modification operations allowed
 - **API Key Protection**: Environment-based configuration keeps credentials secure
 
-## 📊 Monitoring & Analytics
+## Monitoring & Analytics
 
 ### Query Logs Dashboard
 
@@ -239,7 +239,7 @@ Returns:
 }
 ```
 
-## 🎨 Customization
+## Customization
 
 ### Styling
 
@@ -265,16 +265,16 @@ Modify `init_db.py` to customize sample data:
 
 This project showcases several software engineering best practices:
 
-✅ **Clean Code**: Descriptive variable names, clear function purposes, comprehensive comments  
-✅ **Separation of Concerns**: Models, logic, and presentation layers are distinct  
-✅ **Error Handling**: Graceful degradation with user-friendly error messages  
-✅ **Security First**: Multiple layers of SQL injection prevention  
-✅ **Observability**: Comprehensive logging for debugging and analysis  
-✅ **User Experience**: Clear feedback, loading states, and helpful examples  
-✅ **Documentation**: Extensive inline comments and user-facing docs  
-✅ **Configuration Management**: Environment-based settings for flexibility  
+**Clean Code**: Descriptive variable names, clear function purposes, comprehensive comments  
+**Separation of Concerns**: Models, logic, and presentation layers are distinct  
+**Error Handling**: Graceful degradation with user-friendly error messages  
+**Security First**: Multiple layers of SQL injection prevention  
+**Observability**: Comprehensive logging for debugging and analysis  
+**User Experience**: Clear feedback, loading states, and helpful examples  
+**Documentation**: Extensive inline comments and user-facing docs  
+**Configuration Management**: Environment-based settings for flexibility  
 
-## 🔧 Troubleshooting
+## Troubleshooting
 
 ### "OpenAI API key not configured" error
 
@@ -308,7 +308,7 @@ This is normal for complex or ambiguous queries. The system flags queries when i
 - Check the generated SQL for accuracy
 - Provide feedback to help improve the system
 
-## 🚀 Deployment
+## Deployment
 
 For production deployment:
 
@@ -323,20 +323,20 @@ For production deployment:
 5. **Set up monitoring** for the `/health` endpoint
 6. **Enable rate limiting** to prevent API abuse
 
-## 📄 License
+## License
 
 This project is available for portfolio and educational purposes. Feel free to use it as inspiration for your own projects.
 
-## 🤝 Contributing
+## Contributing
 
 This is a portfolio project, but feedback and suggestions are welcome! Feel free to open issues or submit pull requests.
 
 ## 👤 Author
 
-Built by [Your Name] as a technical demonstration project.  
+Built by Ishan Barot (me) as a technical demonstration project.  
 Website: [apexion.app](https://apexion.app)
 
-## 🙏 Acknowledgments
+## Acknowledgments
 
 - OpenAI for providing the GPT-4 API
 - Flask community for the excellent web framework
