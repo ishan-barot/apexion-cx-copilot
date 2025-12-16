@@ -1,0 +1,105 @@
+{% extends "base.html" %}
+
+{% block title %}Query Logs - Apexion CX Copilot{% endblock %}
+
+{% block content %}
+<div class="logs-section">
+    <h1>Query Logs</h1>
+    <p class="subtitle">Comprehensive tracking for analysis and debugging</p>
+    
+    <div class="stats-grid">
+        <div class="stat-card">
+            <div class="stat-value">{{ stats.total_queries }}</div>
+            <div class="stat-label">Total Queries</div>
+        </div>
+        <div class="stat-card success">
+            <div class="stat-value">{{ stats.successful_queries }}</div>
+            <div class="stat-label">Successful</div>
+        </div>
+        <div class="stat-card error">
+            <div class="stat-value">{{ stats.failed_queries }}</div>
+            <div class="stat-label">Failed</div>
+        </div>
+        <div class="stat-card">
+            <div class="stat-value">{{ stats.success_rate }}%</div>
+            <div class="stat-label">Success Rate</div>
+        </div>
+        <div class="stat-card">
+            <div class="stat-value">{{ stats.helpful_feedback }}</div>
+            <div class="stat-label">Helpful Feedback</div>
+        </div>
+        <div class="stat-card">
+            <div class="stat-value">{{ stats.not_helpful_feedback }}</div>
+            <div class="stat-label">Not Helpful</div>
+        </div>
+    </div>
+    
+    <h2>Recent Logs</h2>
+    
+    {% if logs %}
+        <div class="table-container">
+            <table class="logs-table">
+                <thead>
+                    <tr>
+                        <th>ID</th>
+                        <th>Timestamp</th>
+                        <th>Session</th>
+                        <th>Question</th>
+                        <th>SQL</th>
+                        <th>Results</th>
+                        <th>Time (ms)</th>
+                        <th>Confidence</th>
+                        <th>Status</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for log in logs %}
+                    <tr class="{% if not log.success %}error-row{% endif %}">
+                        <td>{{ log.id }}</td>
+                        <td>{{ log.timestamp.strftime('%Y-%m-%d %H:%M:%S') }}</td>
+                        <td><code>{{ log.session_id[:8] }}</code></td>
+                        <td class="question-cell">{{ log.user_question }}</td>
+                        <td class="sql-cell">
+                            {% if log.generated_sql %}
+                                <pre>{{ log.generated_sql[:100] }}{% if log.generated_sql|length > 100 %}...{% endif %}</pre>
+                            {% else %}
+                                <em>N/A</em>
+                            {% endif %}
+                        </td>
+                        <td>{{ log.result_count if log.result_count is not none else 'N/A' }}</td>
+                        <td>{{ log.response_time_ms if log.response_time_ms else 'N/A' }}</td>
+                        <td>
+                            {% if log.confidence_score %}
+                                <span class="confidence-badge {% if log.confidence_score >= 0.7 %}high{% elif log.confidence_score >= 0.5 %}medium{% else %}low{% endif %}">
+                                    {{ (log.confidence_score * 100)|round(0)|int }}%
+                                </span>
+                            {% else %}
+                                N/A
+                            {% endif %}
+                        </td>
+                        <td>
+                            {% if log.success %}
+                                <span class="status-badge success">✓</span>
+                            {% else %}
+                                <span class="status-badge error">✗</span>
+                            {% endif %}
+                        </td>
+                    </tr>
+                    {% if not log.success and log.error_message %}
+                    <tr class="error-detail-row">
+                        <td colspan="9">
+                            <strong>Error:</strong> {{ log.error_message }}
+                        </td>
+                    </tr>
+                    {% endif %}
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    {% else %}
+        <div class="empty-state">
+            <p>No logs yet. <a href="/">Start querying!</a></p>
+        </div>
+    {% endif %}
+</div>
+{% endblock %}

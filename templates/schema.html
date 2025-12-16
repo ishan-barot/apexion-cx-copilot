@@ -1,0 +1,94 @@
+{% extends "base.html" %}
+
+{% block title %}Database Schema - Apexion CX Copilot{% endblock %}
+
+{% block content %}
+<div class="schema-section">
+    <h1>Database Schema</h1>
+    <p class="subtitle">Understanding your customer experience data structure</p>
+    
+    <div class="schema-overview">
+        <h2>Tables Overview</h2>
+        <div class="schema-diagram">
+            <div class="schema-table">
+                <strong>customers</strong> → Core customer information
+            </div>
+            <div class="schema-connection">↓ has many</div>
+            <div class="schema-table">
+                <strong>support_tickets</strong> → Customer support issues
+            </div>
+            <div class="schema-connection">↓ has many</div>
+            <div class="schema-table">
+                <strong>interactions</strong> → Agent engagements
+            </div>
+            <div class="schema-spacer"></div>
+            <div class="schema-table">
+                <strong>customer_notes</strong> → Unstructured context
+            </div>
+            <div class="schema-connection">↑ belongs to customers</div>
+        </div>
+    </div>
+    
+    {% for table_name, table_info in schema.items() %}
+    <div class="table-detail">
+        <h2>{{ table_name }}</h2>
+        <p class="table-description">{{ table_info.description }}</p>
+        
+        <table class="schema-table-detail">
+            <thead>
+                <tr>
+                    <th>Column</th>
+                    <th>Type</th>
+                    <th>Description</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for column in table_info.columns %}
+                <tr>
+                    <td><code>{{ column.name }}</code></td>
+                    <td><span class="type-badge">{{ column.type }}</span></td>
+                    <td>{{ column.description }}</td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+    {% endfor %}
+    
+    <div class="query-tips">
+        <h2>Query Tips</h2>
+        <div class="tips-grid">
+            <div class="tip-card">
+                <h3>🔍 Filtering</h3>
+                <p>Ask about specific statuses, priorities, or tiers</p>
+                <code>Show me urgent open tickets</code>
+            </div>
+            <div class="tip-card">
+                <h3>📅 Time-based</h3>
+                <p>Query by dates and time ranges</p>
+                <code>Customers who signed up last month</code>
+            </div>
+            <div class="tip-card">
+                <h3>🔗 Relationships</h3>
+                <p>Combine data across tables</p>
+                <code>Enterprise customers with unresolved tickets</code>
+            </div>
+            <div class="tip-card">
+                <h3>📝 Notes Search</h3>
+                <p>Search unstructured customer notes</p>
+                <code>Find customers tagged as VIP or partnership</code>
+            </div>
+            <div class="tip-card">
+                <h3>📊 Aggregations</h3>
+                <p>Count, sum, and average data</p>
+                <code>Average resolution time by priority</code>
+            </div>
+            <div class="tip-card">
+                <h3>👥 Agent Performance</h3>
+                <p>Analyze support team activity</p>
+                <code>Which agent has the most interactions?</code>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

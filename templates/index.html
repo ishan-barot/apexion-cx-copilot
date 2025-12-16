@@ -1,0 +1,219 @@
+{% extends "base.html" %}
+
+{% block title %}Query - Apexion CX Copilot{% endblock %}
+
+{% block content %}
+<div class="query-section">
+    <h1>Ask a Question</h1>
+    <p class="subtitle">Query your customer experience data using natural language</p>
+    
+    <div class="query-examples">
+        <p class="examples-title">Try asking:</p>
+        <div class="example-chips">
+            <button class="example-chip" onclick="setQuestion(this.textContent)">Which customers have urgent open tickets?</button>
+            <button class="example-chip" onclick="setQuestion(this.textContent)">Show me enterprise customers who signed up in the last year</button>
+            <button class="example-chip" onclick="setQuestion(this.textContent)">What are the common issues from customers with VIP tags?</button>
+            <button class="example-chip" onclick="setQuestion(this.textContent)">Which agent handled the most phone interactions?</button>
+        </div>
+    </div>
+    
+    <div class="query-form">
+        <textarea id="questionInput" 
+                  placeholder="e.g., Show me all enterprise customers with open tickets..."
+                  rows="4"></textarea>
+        <button id="submitBtn" onclick="submitQuery()">Ask Question</button>
+    </div>
+    
+    <div id="loading" class="loading" style="display: none;">
+        <div class="spinner"></div>
+        <p>Processing your question...</p>
+    </div>
+    
+    <div id="results" style="display: none;">
+        <div id="confidenceWarning" class="warning-box" style="display: none;">
+            <strong>⚠️ Low Confidence</strong>
+            <p>The system is less confident about this query. Please verify the results carefully.</p>
+        </div>
+        
+        <div class="result-section">
+            <h2>Summary</h2>
+            <div id="summary" class="summary-box"></div>
+        </div>
+        
+        <div class="result-section">
+            <h3>SQL Query Generated</h3>
+            <pre id="sqlQuery" class="code-block"></pre>
+            <p class="reasoning" id="reasoning"></p>
+        </div>
+        
+        <div class="result-section">
+            <h3>Results <span id="resultCount" class="badge"></span></h3>
+            <div id="resultsTable" class="table-container"></div>
+        </div>
+        
+        <div class="feedback-section">
+            <h3>Was this helpful?</h3>
+            <div class="feedback-buttons">
+                <button class="feedback-btn helpful" onclick="submitFeedback('helpful')">👍 Helpful</button>
+                <button class="feedback-btn not-helpful" onclick="submitFeedback('not_helpful')">👎 Not Helpful</button>
+            </div>
+            <div id="feedbackMessage" class="feedback-message" style="display: none;"></div>
+        </div>
+    </div>
+    
+    <div id="error" class="error-box" style="display: none;"></div>
+</div>
+
+<script>
+let currentLogId = null;
+
+function setQuestion(text) {
+    document.getElementById('questionInput').value = text;
+}
+
+async function submitQuery() {
+    const question = document.getElementById('questionInput').value.trim();
+    
+    if (!question) {
+        showError('Please enter a question');
+        return;
+    }
+    
+    // reset ui
+    document.getElementById('results').style.display = 'none';
+    document.getElementById('error').style.display = 'none';
+    document.getElementById('loading').style.display = 'block';
+    document.getElementById('submitBtn').disabled = true;
+    
+    try {
+        const response = await fetch('/query', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify({ question })
+        });
+        
+        const data = await response.json();
+        
+        document.getElementById('loading').style.display = 'none';
+        document.getElementById('submitBtn').disabled = false;
+        
+        if (data.success) {
+            displayResults(data);
+        } else {
+            showError(data.error || 'An error occurred processing your query');
+        }
+    } catch (error) {
+        document.getElementById('loading').style.display = 'none';
+        document.getElementById('submitBtn').disabled = false;
+        showError('Network error. Please try again.');
+    }
+}
+
+function displayResults(data) {
+    currentLogId = data.log_id;
+    
+    // show confidence warning if needed
+    const confidenceWarning = document.getElementById('confidenceWarning');
+    if (data.confidence < 0.7) {
+        confidenceWarning.style.display = 'block';
+    } else {
+        confidenceWarning.style.display = 'none';
+    }
+    
+    // display summary
+    document.getElementById('summary').innerHTML = data.summary.replace(/\n/g, '<br>');
+    
+    // display sql
+    document.getElementById('sqlQuery').textContent = data.sql;
+    document.getElementById('reasoning').textContent = data.reasoning;
+    
+    // display result count
+    document.getElementById('resultCount').textContent = `${data.count} rows`;
+    
+    // display results table
+    const tableContainer = document.getElementById('resultsTable');
+    if (data.count > 0) {
+        let tableHTML = '<table class="results-table"><thead><tr>';
+        
+        // add row number column
+        tableHTML += '<th>Row</th>';
+        
+        // add data columns
+        data.columns.forEach(col => {
+            tableHTML += `<th>${col}</th>`;
+        });
+        tableHTML += '</tr></thead><tbody>';
+        
+        // add data rows
+        data.results.forEach((row, idx) => {
+            tableHTML += '<tr>';
+            tableHTML += `<td class="row-number">${idx + 1}</td>`;
+            data.columns.forEach(col => {
+                const value = row[col];
+                tableHTML += `<td>${value !== null ? value : '<em>null</em>'}</td>`;
+            });
+            tableHTML += '</tr>';
+        });
+        
+        tableHTML += '</tbody></table>';
+        tableContainer.innerHTML = tableHTML;
+    } else {
+        tableContainer.innerHTML = '<p class="no-results">No results found</p>';
+    }
+    
+    // show results section
+    document.getElementById('results').style.display = 'block';
+    
+    // scroll to results
+    document.getElementById('results').scrollIntoView({ behavior: 'smooth' });
+}
+
+function showError(message) {
+    const errorBox = document.getElementById('error');
+    errorBox.textContent = message;
+    errorBox.style.display = 'block';
+}
+
+async function submitFeedback(rating) {
+    if (!currentLogId) return;
+    
+    try {
+        const response = await fetch('/feedback', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify({ 
+                log_id: currentLogId, 
+                rating: rating 
+            })
+        });
+        
+        const data = await response.json();
+        
+        if (data.success) {
+            const messageDiv = document.getElementById('feedbackMessage');
+            messageDiv.textContent = '✓ Thank you for your feedback!';
+            messageDiv.style.display = 'block';
+            
+            // disable feedback buttons
+            document.querySelectorAll('.feedback-btn').forEach(btn => {
+                btn.disabled = true;
+            });
+        }
+    } catch (error) {
+        console.error('Error submitting feedback:', error);
+    }
+}
+
+// allow enter key to submit (with shift+enter for new line)
+document.getElementById('questionInput').addEventListener('keydown', function(e) {
+    if (e.key === 'Enter' && !e.shiftKey) {
+        e.preventDefault();
+        submitQuery();
+    }
+});
+</script>
+{% endblock %}

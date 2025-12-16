@@ -1,0 +1,32 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{% block title %}Apexion CX Copilot{% endblock %}</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+</head>
+<body>
+    <nav class="navbar">
+        <div class="nav-container">
+            <a href="/" class="brand">Apexion CX Copilot</a>
+            <ul class="nav-links">
+                <li><a href="/" class="{% if request.path == '/' %}active{% endif %}">Query</a></li>
+                <li><a href="/history" class="{% if request.path == '/history' %}active{% endif %}">History</a></li>
+                <li><a href="/logs" class="{% if request.path == '/logs' %}active{% endif %}">Logs</a></li>
+                <li><a href="/schema" class="{% if request.path == '/schema' %}active{% endif %}">Schema</a></li>
+            </ul>
+        </div>
+    </nav>
+    
+    <main class="container">
+        {% block content %}{% endblock %}
+    </main>
+    
+    <footer>
+        <p>Built with Flask + OpenAI • <a href="https://apexion.app" target="_blank">apexion.app</a></p>
+    </footer>
+    
+    {% block scripts %}{% endblock %}
+</body>
+</html>

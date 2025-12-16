@@ -1,0 +1,60 @@
+{% extends "base.html" %}
+
+{% block title %}Query History - Apexion CX Copilot{% endblock %}
+
+{% block content %}
+<div class="history-section">
+    <h1>Query History</h1>
+    <p class="subtitle">Your recent questions and results</p>
+    
+    {% if queries %}
+        <div class="history-list">
+            {% for query in queries %}
+            <div class="history-item {% if not query.success %}error{% endif %}">
+                <div class="history-header">
+                    <span class="timestamp">{{ query.timestamp.strftime('%Y-%m-%d %H:%M:%S') }}</span>
+                    <span class="status {% if query.success %}success{% else %}failed{% endif %}">
+                        {% if query.success %}✓ Success{% else %}✗ Failed{% endif %}
+                    </span>
+                </div>
+                
+                <div class="history-question">
+                    <strong>Question:</strong> {{ query.user_question }}
+                </div>
+                
+                {% if query.success %}
+                    <div class="history-sql">
+                        <strong>SQL:</strong>
+                        <pre>{{ query.generated_sql }}</pre>
+                    </div>
+                    
+                    <div class="history-stats">
+                        <span class="stat">Results: {{ query.result_count or 0 }}</span>
+                        <span class="stat">Response time: {{ query.response_time_ms }}ms</span>
+                        <span class="stat">Confidence: {{ (query.confidence_score * 100)|round(1) if query.confidence_score else 'N/A' }}%</span>
+                    </div>
+                    
+                    {% if query.feedback_entries %}
+                        <div class="history-feedback">
+                            {% for feedback in query.feedback_entries %}
+                                <span class="feedback-badge {{ feedback.rating }}">
+                                    {% if feedback.rating == 'helpful' %}👍 Helpful{% else %}👎 Not Helpful{% endif %}
+                                </span>
+                            {% endfor %}
+                        </div>
+                    {% endif %}
+                {% else %}
+                    <div class="history-error">
+                        <strong>Error:</strong> {{ query.error_message }}
+                    </div>
+                {% endif %}
+            </div>
+            {% endfor %}
+        </div>
+    {% else %}
+        <div class="empty-state">
+            <p>No query history yet. <a href="/">Start asking questions!</a></p>
+        </div>
+    {% endif %}
+</div>
+{% endblock %}
